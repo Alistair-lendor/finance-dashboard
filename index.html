@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>财务 · Finance</title>
+<style>
+/* ===== Reset & Base — Apple Inspired, Impeccable ===== */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:-apple-system,'SF Pro Display','PingFang SC','Helvetica Neue',sans-serif;
+  background:#fafafa;color:#1d1d1f;
+  font-size:15px;line-height:1.5;
+  max-width:480px;margin:0 auto;
+  padding-bottom:120px;
+  -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums;
+}
+@medi(min-width:481px){body{border-left:1px solid #e5e5ea;border-right:1px solid #e5e5ea;min-height:100vh}}
+
+/* ===== Header — sticky, minimal ===== */
+.header{
+  position:sticky;top:0;z-index:10;
+  background:rgba(250,250,250,0.92);
+  backdrop-filter:saturate(180%) blur(24px);
+  -webkit-backdrop-filter:saturate(180%) blur(24px);
+  padding:20px 24px 16px;
+  border-bottom:1px solid #e5e5ea;
+}
+.header-title{
+  font-size:11px;font-weight:600;color:#86868b;
+  letter-spacing:1.5px;text-transform:uppercase;
+  margin-bottom:2px;
+}
+.header-month{
+  font-size:32px;font-weight:700;color:#1d1d1f;
+  letter-spacing:-1px;line-height:1.1;
+}
+.header-nav{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:12px;
+}
+.header-nav button{
+  background:none;border:none;
+  width:32px;height:32px;
+  font-size:18px;color:#515154;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:50%;transition:background .12s;
+}
+.header-nav button:active{background:#e5e5ea;color:#1d1d1f}
+.header-nav .month-label{font-size:15px;font-weight:500;color:#515154}
+.header-payday{font-size:12px;color:#86868b;margin-top:8px;letter-spacing:0.2px}
+.header-payday span{color:#0071e3;font-weight:500}
+
+/* ===== Section — rhythmic spacing ===== */
+.section{padding:40px 24px 0}
+.section:first-of-type{padding-top:32px}
+.section-label{
+  font-size:11px;font-weight:600;color:#86868b;
+  letter-spacing:1.5px;text-transform:uppercase;
+  margin-bottom:20px;
+}
+
+/* ===== Hero — massive numbers, whitespace-driven ===== */
+.hero{
+  padding:8px 24px 0;
+  text-align:center;
+}
+.hero-balance{
+  font-size:48px;font-weight:700;
+  letter-spacing:-1.5px;line-height:1.05;
+  color:#1d1d1f;
+  margin-bottom:4px;
+  transition:color .3s;
+}
+.hero-balance.negative{color:#ff3b30}
+.hero-balance-label{
+  font-size:12px;font-weight:500;color:#86868b;
+  letter-spacing:0.5px;margin-bottom:20px;
+}
+.hero-row{
+  display:flex;justify-content:center;gap:40px;
+  margin-top:4px;
+}
+.hero-stat{text-align:center}
+.hero-stat-label{font-size:12px;font-weight:500;color:#86868b;margin-bottom:4px}
+.hero-stat-value{font-size:20px;font-weight:600;letter-spacing:-0.3px;line-height:1.2}
+.hero-stat-value.income{color:#34c759}
+.hero-stat-value.expense{color:#ff3b30}
+
+/* ===== Health Indicators — 2x2, tight ===== */
+.health-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.health-card{
+  padding:14px 0;
+  border-bottom:1px solid #f0f0f5;
+}
+.health-card:nth-child(odd){padding-right:12px}
+.health-card:nth-child(even){padding-left:12px;border-left:1px solid #f0f0f5}
+.health-label{font-size:11px;font-weight:500;color:#86868b;margin-bottom:4px;letter-spacing:0.3px}
+.health-value{font-size:22px;font-weight:700;letter-spacing:-0.5px;line-height:1.2}
+.health-extra{font-size:11px;color:#aeaeb2;margin-top:3px}
+
+/* ===== Jars — thin, sophisticated ===== */
+.jars-inner{padding:0 24px}
+.jar-item{margin-bottom:20px}
+.jar-item:last-child{margin-bottom:0}
+.jar-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.jar-name{font-size:14px;font-weight:600;color:#1d1d1f;letter-spacing:-0.2px}
+.jar-amount{font-size:13px;color:#86868b;font-weight:500;font-variant-numeric:tabular-nums}
+.jar-bar-outer{
+  height:5px;background:#f0f0f5;border-radius:2.5px;overflow:hidden;
+  position:relative;
+}
+.jar-bar-fill{
+  height:100%;border-radius:2.5px;
+  transition:width .6s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+.jar-detail{font-size:11px;color:#aeaeb2;margin-top:5px;letter-spacing:0.2px}
+
+/* ===== Chart Area — minimal, no card ===== */
+.chart-area{
+  padding:20px 24px 0;
+}
+.chart-area .section-label{margin-bottom:14px}
+.chart-canvas-wrap{
+  padding:16px 0;
+  border-top:1px solid #f0f0f5;
+  margin-top:16px;
+}
+.chart-canvas-wrap:first-child{border-top:none;margin-top:0}
+.chart-title{font-size:13px;font-weight:600;color:#1d1d1f;margin-bottom:10px;letter-spacing:-0.1px}
+.chart-canvas-wrap canvas{width:100%!important;height:200px!important}
+
+/* ===== Records — list, no card bg ===== */
+.record-list{padding:0 24px}
+.record-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:12px 0;
+  border-bottom:1px solid #f0f0f5;
+  transition:background .12s;
+}
+.record-row:last-child{border-bottom:none}
+.record-left{display:flex;align-items:center;gap:10px;min-width:0}
+.record-date{font-size:12px;color:#aeaeb2;flex-shrink:0;font-variant-numeric:tabular-nums;letter-spacing:0.3px}
+.record-cat{
+  font-size:13px;color:#1d1d1f;font-weight:500;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  display:flex;align-items:center;gap:6px;
+}
+.record-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.record-amt{font-size:15px;font-weight:600;letter-spacing:-0.2px;font-variant-numeric:tabular-nums}
+.record-amt.exp{color:#ff3b30}
+.record-amt.inc{color:#34c759}
+.record-del{
+  background:none;border:none;font-size:16px;color:#aeaeb2;cursor:pointer;
+  width:24px;height:24px;display:flex;align-items:center;justify-content:center;
+  border-radius:50%;transition:all .12s;
+}
+.record-del:active{background:#f0f0f5;color:#ff3b30}
+.empty-state{text-align:center;padding:40px 0;color:#aeaeb2;font-size:14px;letter-spacing:0.3px}
+
+/* ===== Add Record Form — floating, minimal ===== */
+.add-bar{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:480px;
+  background:rgba(250,250,250,0.95);
+  backdrop-filter:saturate(180%) blur(24px);
+  -webkit-backdrop-filter:saturate(180%) blur(24px);
+  border-top:1px solid #e5e5ea;
+  padding:12px 24px 24px;
+  z-index:20;
+}
+.add-form{display:flex;gap:8px;align-items:flex-end}
+.add-form input,.add-form select{
+  border:1px solid #d2d2d7;background:#fff;
+  border-radius:10px;padding:10px 12px;font-size:14px;
+  font-family:inherit;color:#1d1d1f;outline:none;
+  transition:border-color .15s;
+  -webkit-appearance:none;
+}
+.add-form input:focus,.add-form select:focus{border-color:#0071e3}
+.add-form input[type=date]{width:110px;font-variant-numeric:tabular-nums}
+.add-form input[type=number]{width:80px}
+.add-form select{width:90px;font-size:13px}
+.add-form input[name=remark]{flex:1;font-size:13px}
+.add-form button{
+  background:#0071e3;border:none;color:#fff;
+  border-radius:10px;padding:0 16px;height:38px;
+  font-size:14px;font-weight:600;cursor:pointer;
+  font-family:inherit;transition:opacity .15s;flex-shrink:0;
+}
+.add-form button:active{opacity:0.7}
+
+/* ===== Toast — minimal ===== */
+.toast{
+  position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
+  background:rgba(29,29,31,0.92);color:#fff;
+  padding:10px 20px;border-radius:12px;
+  font-size:13px;font-weight:500;
+  opacity:0;transition:opacity .25s;
+  pointer-events:none;white-space:nowrap;
+  z-index:100;letter-spacing:0.2px;
+}
+
+/* ===== Animations ===== */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(12px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.animate-in{animation:fadeUp .45s cubic-bezier(0.25,0.46,0.45,0.94) both}
+.hero .hero-balance{animation-delay:.05s}
+.hero .hero-balance-label{animation-delay:.1s}
+.hero .hero-row{animation-delay:.15s}
+.section:nth-child(2){animation-delay:.1s}
+.section:nth-child(3){animation-delay:.15s}
+.section:nth-child(4){animation-delay:.2s}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-title">个人财务</div>
+  <div class="header-month" id="headerMonth">6月 2026</div>
+  <div class="header-nav">
+    <button id="prevMonth">‹</button>
+    <span class="month-label" id="monthLabel">2026年6月</span>
+    <button id="nextMonth">›</button>
+  </div>
+  <div class="header-payday" id="paydayInfo">距离发薪日（25日）<span>6 天</span></div>
+</div>
+
+<!-- Hero: massive balance number -->
+<div class="hero animate-in">
+  <div class="hero-balance" id="heroBalance">--</div>
+  <div class="hero-balance-label" id="heroLabel">净结余</div>
+  <div class="hero-row">
+    <div class="hero-stat">
+      <div class="hero-stat-label">收入</div>
+      <div class="hero-stat-value income" id="heroIncome">--</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-label">支出</div>
+      <div class="hero-stat-value expense" id="heroExpense">--</div>
+    </div>
+  </div>
+</div>
+
+<!-- Health Indicators -->
+<div class="section animate-in">
+  <div class="section-label">财务健康</div>
+  <div class="health-grid" id="healthGrid"></div>
+</div>
+
+<!-- Jars -->
+<div class="section animate-in">
+  <div class="section-label">目标进度</div>
+  <div class="jars-inner" id="jarsInner"></div>
+</div>
+
+<!-- Charts -->
+<div class="chart-area" id="chartsArea"></div>
+
+<!-- Records -->
+<div class="section animate-in" id="recordsSection">
+  <div class="section-label" id="recordsTitle">最近记录</div>
+  <div class="record-list" id="recordList"></div>
+</div>
+
+<!-- Add Record Bar -->
+<div class="add-bar">
+  <form class="add-form" id="addForm" onsubmit="return false">
+    <input type="date" name="date" id="inputDate" value="">
+    <select name="type" id="inputType">
+      <option value="expense">支出</option>
+      <option value="income">收入</option>
+    </select>
+    <select name="category" id="inputCat"></select>
+    <input type="number" name="amount" id="inputAmt" placeholder="金额" step="0.01" min="0">
+    <input type="text" name="remark" id="inputRemark" placeholder="备注">
+    <button type="submit" id="addBtn">添加</button>
+  </form>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="_toast"></div>
+
+<script>
+// ======== CONFIG — all in one place ========
+const EXPENSE_CATS = ['生活日用','餐饮','交通出行','信用借还','休闲社交','数码电器','生活服务','其他'];
+const INCOME_CATS  = ['工资','PingPong副业','退款收入','其他收入'];
+const CAT_COLORS = ['#0071e3','#34c759','#ff9500','#af52de','#ff3b30','#00c7be','#ac8e68','#8e8e93'];
+const FIXED = {
+  expense: [
+    { cat:'房贷',       amount:4581.06, note:'月供' },
+    { cat:'车位贷',     amount:1091.22, note:'月供' },
+    { cat:'房租',       amount:1750.00, note:'含物业费¥143' },
+    { cat:'信用卡分期', amount:296.00,   note:'' },
+    { cat:'通信',       amount:150.00,   note:'' },
+  ],
+  income: []
+};
+const JARS = [
+  { id:1, name:'日常消费',     budget:0,    target:4000,  color:'#ff9500', desc:'浮动资金',       type:'revolving' },
+  { id:2, name:'应急备用',     budget:0,    target:47210, color:'#34c759', desc:'6个月固定支出', type:'target' },
+  { id:3, name:'购车基金',     budget:0,    target:60000, color:'#0071e3', desc:'15-20万车型首付',  type:'target' },
+  { id:4, name:'投资理财',     budget:0,    target:0,     color:'#af52de', desc:'应急+购车达标后',  type:'future' },
+];
+
+const IMPECCABLE_DESIGN_CTX = {
+  accent:'#0071e3', positive:'#34c759', negative:'#ff3b30', neutral:'#86868b'
+};
+
+// ======== DATA LAYER ========
+function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function getMonthKey(y,m){return y+'-'+String(m).padStart(2,'0')}
+function migrateData(){
+  try{
+    const raw=localStorage.getItem('finance_records');
+    if(!raw)return;
+    const data=JSON.parse(raw);
+    let changed=false;
+    (data||[]).forEach(r=>{
+      if(r.type==='income')r.type='收入';
+      if(r.type==='expense')r.type='支出';
+      const oldCat=r.category;
+      const catMap={'商户消费':'生活日用','扫二维码付款':'生活日用','人情社交':'休闲社交','休闲玩乐':'休闲社交','工资薪金':'工资','工资':'工资','退款':'退款收入'};
+      if(catMap[oldCat]){r.category=catMap[oldCat];changed=true}
+    });
+    if(changed)localStorage.setItem('finance_records',JSON.stringify(data));
+  }catch(e){}
+}
+function loadRecords(){try{return JSON.parse(localStorage.getItem('finance_records')||'[]')}catch(e){return[]}}
+function saveRecords(data){localStorage.setItem('finance_records',JSON.stringify(data))}
+function mergeImported(){
+  const existing=loadRecords();
+  let exSet=new Set();
+  existing.forEach(r=>{exSet.add((r.date||'')+'|'+(r.amount||'')+'|'+(r.remark||'')+'|'+(r.category||''))});
+  let added=0;
+  (typeof IMPORTED_JUNE_DATA!=='undefined'?IMPORTED_JUNE_DATA:[]).forEach(r=>{
+    const key=(r.date||'')+'|'+(r.amount||'')+'|'+(r.remark||'')+'|'+(r.category||'');
+    if(!exSet.has(key)){existing.push({...r,id:Date.now()+Math.random()});exSet.add(key);added++}
+  });
+  if(added)saveRecords(existing);
+  return added;
+}
+
+// ======== STATE ========
+let currentYear=0,currentMonth=0;
+
+// ======== COMPUTE ========
+function allRecords(){
+  const builtin=(typeof IMPORTED_JUNE_DATA!=='undefined'?IMPORTED_JUNE_DATA:[]).map(r=>({...r}));
+  const user=loadRecords();
+  const merged=[...builtin,...user];
+  merged.forEach(r=>{if(r.type==='income')r.type='收入';if(r.type==='expense')r.type='支出';if(!r.id)r.id=Date.now()+Math.random()});
+  return merged;
+}
+function compute(monthOnly){
+  const data=allRecords();const key=getMonthKey(currentYear,currentMonth);
+  const rows=monthOnly?data.filter(r=>r.date&&r.date.startsWith(key)):data;
+  let totalIncome=0,totalExpense=0,incCount=0,expCount=0;
+  const catSum={},sourceSum={};
+  rows.forEach(r=>{
+    const t=r.type,a=Number(r.amount)||0;
+    if(t==='收入'){totalIncome+=a;incCount++;sourceSum[r.category]=(sourceSum[r.category]||0)+a}
+    if(t==='支出'){totalExpense+=a;expCount++;catSum[r.category]=(catSum[r.category]||0)+a}
+  });
+  const net=totalIncome-totalExpense;
+  const savingsRate=totalIncome>0?(net/totalIncome*100):0;
+  const today=new Date(),daysInMonth=new Date(currentYear,currentMonth,0).getDate();
+  const dayCount=monthOnly?Math.min(today.getDate(),daysInMonth):null;
+  const fixedMonthly=FIXED.expense.reduce((s,e)=>s+e.amount,0);
+  const fixedProportion=fixedMonthly/30;
+  return {totalIncome,totalExpense,net,savingsRate,incCount,expCount,catSum,sourceSum,dayCount,fixedMonthly,fixedProportion,daysInMonth};
+}
+
+// ======== RENDER ========
+function renderHeader(t){
+  document.getElementById('headerMonth').textContent=currentMonth+'月 '+currentYear;
+  document.getElementById('monthLabel').textContent=currentYear+'年'+currentMonth+'月';
+  const payday=new Date(currentYear,currentMonth-1,25);
+  const now=new Date();if(now>payday)payday.setMonth(payday.getMonth()+1);
+  const diff=Math.ceil((payday-now)/(1000*60*60*24));
+  document.getElementById('paydayInfo').innerHTML='距离发薪日（25日）<span>'+diff+' 天</span>';
+}
+
+function renderHero(t){
+  const el=document.getElementById('heroBalance');
+  const label=document.getElementById('heroLabel');
+  const incEl=document.getElementById('heroIncome');
+  const expEl=document.getElementById('heroExpense');
+  const isNeg=t.net<0;
+  el.textContent='¥'+formatNum(t.net);
+  el.className='hero-balance'+(isNeg?' negative':'');
+  label.textContent=isNeg?'本月超支':'净结余';
+  incEl.textContent='¥'+formatNum(t.totalIncome);
+  expEl.textContent='¥'+formatNum(t.totalExpense);
+}
+
+function renderHealth(t){
+  const grid=document.getElementById('healthGrid');
+  const daysPassed=Math.min(new Date().getDate(),t.daysInMonth);
+  const dailyAvg=t.totalExpense>0&&daysPassed>0?t.totalExpense/daysPassed:0;
+  const fixedSoFar=t.fixedProportion*daysPassed;
+  const realExpense=t.totalExpense+fixedSoFar;
+  const realNet=t.totalIncome-realExpense;
+  const realRate=t.totalIncome>0?(realNet/t.totalIncome*100):0;
+  const nextPayday=new Date(currentYear,currentMonth-1,25);
+  const now=new Date();if(now>nextPayday)nextPayday.setMonth(nextPayday.getMonth()+1);
+  const daysToPay=Math.ceil((nextPayday-now)/(1000*60*60*24));
+
+  grid.innerHTML=
+    healthCard('储蓄率',''+realRate.toFixed(1)+'%',realRate>=20?'#34c759':realRate>=0?'#ff9500':'#ff3b30','含固定支出')+
+    healthCard('日均支出','¥'+dailyAvg.toFixed(0),dailyAvg<=200?'#34c759':dailyAvg<=350?'#ff9500':'#ff3b30','月预估 ¥'+Math.round(dailyAvg*30))+
+    healthCard('收支比',(t.totalIncome/(t.totalExpense||1)).toFixed(1),'#0071e3','收入/支出')+
+    healthCard('发薪倒计时',daysToPay+' 天','#86868b','下次：'+nextPayday.getMonth()+1+'月'+nextPayday.getDate()+'日');
+}
+
+function healthCard(label,value,color,extra){
+  return '<div class="health-card"><div class="health-label">'+label+'</div><div class="health-value" style="color:'+color+'">'+value+'</div><div class="health-extra">'+extra+'</div></div>';
+}
+
+function renderJars(t){
+  const wrap=document.getElementById('jarsInner');
+  const fixedSoFar=t.fixedProportion*Math.min(new Date().getDate(),t.daysInMonth);
+  const available=t.net-fixedSoFar;
+  JARS[0].budget=Math.max(0,available);
+  let html='';
+  JARS.forEach(j=>{
+    const pct=j.target>0?Math.min(100,j.budget/j.target*100):0;
+    const pctStr=pct.toFixed(0);
+    html+='<div class="jar-item animate-in">'+
+      '<div class="jar-top"><span class="jar-name">'+j.name+'</span><span class="jar-amount">¥'+formatNum(j.budget)+' / '+((j.target>0&&j.type!=='revolving')?'¥'+formatNum(j.target):'--')+'</span></div>'+
+      '<div class="jar-bar-outer"><div class="jar-bar-fill" style="width:'+pctStr+'%;background:'+j.color+'"></div></div>'+
+      '<div class="jar-detail">'+j.desc+(j.type==='revolving'?'（当前余额 ¥'+formatNum(j.budget)+'）':'（'+pctStr+'%）')+'</div>'+
+    '</div>';
+  });
+  wrap.innerHTML=html;
+}
+
+function renderCharts(t){
+  const area=document.getElementById('chartsArea');
+  area.innerHTML='';
+  // Income pie
+  if(Object.keys(t.sourceSum).length){
+    area.innerHTML+='<div class="chart-canvas-wrap animate-in"><div class="chart-title">收入构成</div><canvas id="incomeChart"></canvas></div>';
+  }
+  // Expense bar
+  if(Object.keys(t.catSum).length){
+    area.innerHTML+='<div class="chart-canvas-wrap animate-in"><div class="chart-title">支出分布</div><canvas id="expenseChart"></canvas></div>';
+  }
+  setTimeout(()=>{
+    renderIncomeChart(t);
+    renderExpenseChart(t);
+  },80);
+}
+
+function renderIncomeChart(t){
+  const canvas=document.getElementById('incomeChart');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const dpr=window.devicePixelRatio||1;
+  canvas.width=canvas.offsetWidth*dpr;canvas.height=200*dpr;
+  ctx.scale(dpr,dpr);
+  const W=canvas.offsetWidth,H=200;
+  const entries=Object.entries(t.sourceSum).sort((a,b)=>b[1]-a[1]);
+  const total=t.totalIncome||1;
+  const colors=['#0071e3','#34c759','#ff9500','#af52de'];
+  const cx=W*0.3,cy=H*0.5,R=Math.min(W*0.25,H*0.4);
+  let angle=-Math.PI/2;
+  ctx.clearRect(0,0,W,H);
+  entries.forEach(([k,v],i)=>{
+    const sweep=v/total*2*Math.PI;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,R,angle,angle+sweep);ctx.closePath();
+    ctx.fillStyle=colors[i%colors.length];ctx.fill();
+    angle+=sweep;
+  });
+  // Center hole
+  ctx.beginPath();ctx.arc(cx,cy,R*0.55,0,2*Math.PI);ctx.fillStyle='#fafafa';ctx.fill();
+  // Labels
+  const legendX=W*0.62;
+  let ly=24;
+  entries.forEach(([k,v],i)=>{
+    ctx.fillStyle=colors[i%colors.length];
+    ctx.beginPath();ctx.arc(legendX,ly+5,4,0,2*Math.PI);ctx.fill();
+    ctx.fillStyle='#1d1d1f';ctx.font='13px -apple-system,sans-serif';ctx.textBaseline='middle';
+    ctx.fillText(k,(legendX+12),ly+5);
+    ctx.fillStyle='#86868b';ctx.font='12px -apple-system,sans-serif';
+    ctx.fillText('¥'+formatNum(v),(legendX+12),ly+22);
+    ly+=40;
+  });
+}
+
+function renderExpenseChart(t){
+  const canvas=document.getElementById('expenseChart');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const dpr=window.devicePixelRatio||1;
+  canvas.width=canvas.offsetWidth*dpr;canvas.height=200*dpr;
+  ctx.scale(dpr,dpr);
+  const W=canvas.offsetWidth,H=200;
+  const entries=Object.entries(t.catSum).sort((a,b)=>b[1]-a[1]);
+  const maxV=entries.length?entries[0][1]:1;
+  const barH=24,gap=10;
+  const chartH=entries.length*(barH+gap)-gap;
+  const ox=80,chartW=W-ox-16;
+  ctx.clearRect(0,0,W,H);
+  entries.forEach(([k,v],i)=>{
+    const y=(H-chartH)/2+i*(barH+gap);
+    ctx.fillStyle='#86868b';ctx.font='12px -apple-system,sans-serif';ctx.textBaseline='middle';ctx.textAlign='right';
+    ctx.fillText(k,ox-10,y+barH/2);
+    const bw=Math.max(2,(v/maxV)*chartW);
+    ctx.fillStyle='#0071e3';
+    ctx.beginPath();ctx.roundRect(ox,y+4,bw,barH-8,3);ctx.fill();
+    ctx.fillStyle='#1d1d1f';ctx.font='600 12px -apple-system,sans-serif';ctx.textAlign='left';
+    ctx.fillText('¥'+formatNum(v),ox+bw+6,y+barH/2);
+  });
+}
+
+function renderRecords(){
+  const data=allRecords();const key=getMonthKey(currentYear,currentMonth);
+  const records=data.filter(r=>r.date&&r.date.startsWith(key)).sort((a,b)=>b.date.localeCompare(a.date));
+  const box=document.getElementById('recordList');
+  const title=document.getElementById('recordsTitle');
+  title.textContent=currentYear+'年'+currentMonth+'月 记录（'+records.length+' 笔）';
+  if(!records.length){box.innerHTML='<div class="empty-state">暂无记录</div>';return}
+  const catColorMap={};let ci=0;
+  [...EXPENSE_CATS,...INCOME_CATS].forEach(c=>{catColorMap[c]=CAT_COLORS[ci++%CAT_COLORS.length]});
+  box.innerHTML=records.map(r=>{
+    const color=catColorMap[r.category]||'#aeaeb2';
+    const sign=r.type==='支出'?'-':'+';
+    const cls=r.type==='支出'?'exp':'inc';
+    return '<div class="record-row">'+
+      '<div class="record-left">'+
+        '<span class="record-date">'+r.date.slice(5)+'</span>'+
+        '<span class="record-cat"><span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:'+color+';flex-shrink:0"></span>'+r.category+(r.remark?' <span style="color:#aeaeb2;font-weight:400;font-size:12px">'+r.remark+'</span>':'')+'</span>'+
+      '</div>'+
+      '<div class="record-right">'+
+        '<span class="record-amt '+cls+'">'+sign+'¥'+Number(r.amount).toFixed(0)+'</span>'+
+        '<button class="record-del" onclick="deleteRecord(\''+r.id+'\')">×</button>'+
+      '</div></div>';
+  }).join('');
+}
+
+function formatNum(n){return Number(n).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',')}
+
+function deleteRecord(id){
+  let data=loadRecords();
+  data=data.filter(r=>String(r.id)!==String(id));
+  saveRecords(data);
+  renderAll();
+  showToast('已删除');
+}
+
+function showToast(msg){
+  let t=document.getElementById('_toast');
+  t.textContent=msg;t.style.opacity='1';clearTimeout(t._timer);
+  t._timer=setTimeout(()=>{t.style.opacity='0'},1500);
+}
+
+function populateCatSelect(){
+  const sel=document.getElementById('inputCat');
+  const isIncome=document.getElementById('inputType').value==='income';
+  const cats=isIncome?INCOME_CATS:EXPENSE_CATS;
+  sel.innerHTML=cats.map(c=>'<option value="'+c+'">'+c+'</option>').join('');
+}
+function setDefaultDate(){
+  const el=document.getElementById('inputDate');
+  if(!el.value)el.value=todayStr();
+}
+
+// ======== INIT ========
+function init(){
+  migrateData();
+  mergeImported();
+  const now=new Date();
+  currentYear=now.getFullYear();currentMonth=now.getMonth()+1;
+  renderAll();
+  document.getElementById('prevMonth').onclick=()=>{currentMonth--;if(currentMonth<1){currentMonth=12;currentYear--}renderAll()};
+  document.getElementById('nextMonth').onclick=()=>{currentMonth++;if(currentMonth>12){currentMonth=1;currentYear++}renderAll()};
+  document.getElementById('inputType').onchange=populateCatSelect;
+  document.getElementById('addForm').onsubmit=function(e){
+    e.preventDefault();
+    const fd=new FormData(this);
+    const date=fd.get('date'),type=fd.get('type'),cat=fd.get('category'),amt=fd.get('amount'),remark=fd.get('remark');
+    if(!date||!cat||!amt||amt<=0){showToast('请填写完整');return}
+    const record={id:Date.now(),date,category:cat,type:type==='income'?'收入':'支出',amount:parseFloat(amt),remark};
+    const data=loadRecords();data.push(record);saveRecords(data);
+    this.reset();setDefaultDate();populateCatSelect();
+    renderAll();
+    showToast('添加成功 +¥'+parseFloat(amt).toFixed(0));
+  };
+  populateCatSelect();setDefaultDate();
+  document.getElementById('inputDate').value=todayStr();
+}
+
+function renderAll(){
+  const t=compute(true);
+  renderHeader(t);renderHero(t);renderHealth(t);renderJars(t);renderCharts(t);renderRecords();
+}
+
+init();
+</script>
+
+<!-- Embedded June Data -->
+<script>
+const IMPORTED_JUNE_DATA = [
+  {"date":"2026-06-01","category":"生活日用","type":"支出","amount":9.9,"remark":"滴露消毒液","source":"支付宝"},
+  {"date":"2026-06-01","category":"通讯","type":"支出","amount":150,"remark":"通信费月付","source":"银行卡"},
+  {"date":"2026-06-02","category":"数码电器","type":"支出","amount":47.9,"remark":"1688","source":"支付宝"},
+  {"date":"2026-06-03","category":"信用借还","type":"支出","amount":998,"remark":"网商银行·1688","source":"支付宝"},
+  {"date":"2026-06-03","category":"餐饮","type":"支出","amount":8,"remark":"中国兰州拉面","source":"微信"},
+  {"date":"2026-06-03","category":"餐饮","type":"支出","amount":11.2,"remark":"凉皮","source":"微信"},
+  {"date":"2026-06-04","category":"生活日用","type":"支出","amount":33.79,"remark":"1688","source":"支付宝"},
+  {"date":"2026-06-05","category":"生活日用","type":"支出","amount":13.3,"remark":"金枕榴莲披萨","source":"支付宝"},
+  {"date":"2026-06-05","category":"通讯","type":"支出","amount":200,"remark":"充话费·工商银行信用卡","source":"支付宝"},
+  {"date":"2026-06-06","category":"生活日用","type":"支出","amount":12,"remark":"杨铭宇黄焖鸡米饭(控江路店)","source":"支付宝"},
+  {"date":"2026-06-07","category":"生活日用","type":"支出","amount":6.99,"remark":"1688","source":"支付宝"},
+  {"date":"2026-06-07","category":"宠物","type":"支出","amount":163,"remark":"皇家MIJ宠物猫粮","source":"支付宝"},
+  {"date":"2026-06-07","category":"餐饮","type":"支出","amount":17.2,"remark":"中国兰州牛肉拉面","source":"微信"},
+  {"date":"2026-06-08","category":"生活日用","type":"支出","amount":10.85,"remark":"扶农公众号商城","source":"微信"},
+  {"date":"2026-06-09","category":"餐饮","type":"支出","amount":24.3,"remark":"老乡鸡(上海控江旭辉MALL店)","source":"支付宝"},
+  {"date":"2026-06-09","category":"休闲娱乐","type":"支出","amount":45.6,"remark":"看电影","source":"微信"},
+  {"date":"2026-06-10","category":"工资薪金","type":"收入","amount":5323.33,"remark":"工资卡/建设银行","source":"银行卡"},
+  {"date":"2026-06-10","category":"信用借还","type":"支出","amount":181.31,"remark":"花呗·工商银行信用卡","source":"支付宝"},
+  {"date":"2026-06-10","category":"餐饮","type":"支出","amount":31.9,"remark":"乡村胡子烤鸡(上海海伦·路店)","source":"支付宝"},
+  {"date":"2026-06-10","category":"生活日用","type":"支出","amount":35.99,"remark":"1688","source":"支付宝"},
+  {"date":"2026-06-10","category":"餐饮","type":"支出","amount":31.41,"remark":"乡村胡子烤鸡(上海海伦·路店)","source":"支付宝"},
+  {"date":"2026-06-11","category":"生活日用","type":"支出","amount":21.98,"remark":"1688","source":"支付宝"},
+  {"date":"2026-06-11","category":"餐饮","type":"支出","amount":21.11,"remark":"紫燕百味鸡·紫燕四拼","source":"微信"},
+  {"date":"2026-06-12","category":"生活日用","type":"支出","amount":12.95,"remark":"钱排银妃三宝李","source":"微信"},
+  {"date":"2026-06-12","category":"数码家电","type":"支出","amount":9.9,"remark":"1688","source":"支付宝"},
+  {"date":"2026-06-12","category":"餐饮","type":"支出","amount":19,"remark":"星巴克","source":"微信"},
+  {"date":"2026-06-12","category":"餐饮","type":"支出","amount":17,"remark":"紫燕百味鸡","source":"微信"},
+  {"date":"2026-06-13","category":"生活服务","type":"支出","amount":6,"remark":"套餐包","source":"支付宝"},
+  {"date":"2026-06-13","category":"生活日用","type":"支出","amount":34.3,"remark":"星巴克杯子","source":"支付宝"},
+  {"date":"2026-06-13","category":"数码家电","type":"支出","amount":5.16,"remark":"充电订单","source":"支付宝"},
+  {"date":"2026-06-14","category":"生活日用","type":"支出","amount":7.44,"remark":"家用防滑无痕衣架","source":"支付宝"},
+  {"date":"2026-06-14","category":"人情社交","type":"支出","amount":15.8,"remark":"亲情卡-仕媛(唐仕媛)","source":"支付宝"},
+  {"date":"2026-06-14","category":"餐饮","type":"支出","amount":16.8,"remark":"杨铭宇黄焖鸡米饭(尚嘉中心店)","source":"支付宝"},
+  {"date":"2026-06-14","category":"其他收入","type":"收入","amount":2.16,"remark":"商家退款","source":"支付宝"},
+  {"date":"2026-06-15","category":"交通出行","type":"支出","amount":46.5,"remark":"高德打车","source":"支付宝"},
+  {"date":"2026-06-15","category":"生活日用","type":"支出","amount":7.72,"remark":"2026新款安全型修眉刀","source":"支付宝"},
+  {"date":"2026-06-15","category":"餐饮","type":"支出","amount":4,"remark":"友客便利店","source":"支付宝"},
+  {"date":"2026-06-15","category":"数码家电","type":"支出","amount":92,"remark":"海尔统帅空气循环扇","source":"支付宝"},
+  {"date":"2026-06-15","category":"餐饮","type":"支出","amount":14,"remark":"中国兰州牛肉拉面","source":"支付宝"},
+  {"date":"2026-06-01","category":"信用卡还款","type":"支出","amount":296,"remark":"信用卡分期月付","source":"银行卡"},
+  {"date":"2026-06-02","category":"房贷","type":"支出","amount":4581.06,"remark":"济南房产月供","source":"银行卡"},
+  {"date":"2026-06-02","category":"车位贷","type":"支出","amount":1091.22,"remark":"车位贷款月供","source":"银行卡"},
+  {"date":"2026-06-01","category":"房租","type":"支出","amount":1750,"remark":"黄岛薛家岛房租+物业费¥143","source":"支付宝"}
+];
+</script>
+</body>
+</html>
