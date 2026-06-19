@@ -341,7 +341,7 @@ function mergeImported(){
     const key=(r.date||'')+'|'+(r.amount||'')+'|'+(r.remark||'')+'|'+(r.category||'');
     if(!exSet.has(key)){existing.push({...r,id:Date.now()+Math.random()});exSet.add(key);added++}
   });
-  if(added)saveRecords(existing);
+  if(added){saveRecords(existing);localStorage.setItem('finance_imported','1')}
   return added;
 }
 
@@ -350,7 +350,8 @@ let currentYear=0,currentMonth=0;
 
 // ======== COMPUTE ========
 function allRecords(){
-  const builtin=(typeof IMPORTED_JUNE_DATA!=='undefined'?IMPORTED_JUNE_DATA:[]).map(r=>({...r}));
+  const imported=localStorage.getItem('finance_imported');
+  const builtin=(!imported && typeof IMPORTED_JUNE_DATA!=='undefined')?IMPORTED_JUNE_DATA:[];
   const user=loadRecords();
   const merged=[...builtin,...user];
   merged.forEach(r=>{if(r.type==='income')r.type='收入';if(r.type==='expense')r.type='支出';if(!r.id)r.id=Date.now()+Math.random()});
@@ -600,56 +601,85 @@ function renderAll(){
   renderHeader(t);renderHero(t);renderHealth(t);renderJars(t);renderCharts(t);renderRecords();
 }
 
+
+// ======== EMBEDDED DATA ========
+const IMPORTED_JUNE_DATA = [
+  {"date":"2026-06-01","category":"休闲社交","type":"支出","amount":21.59,"remark":"亲情卡-仕媛(唐仕媛)","source":"支付宝"},
+  {"date":"2026-06-01","category":"生活日用","type":"支出","amount":19.5,"remark":"星巴克 金烘美式咖啡 大杯","source":"支付宝"},
+  {"date":"2026-06-01","category":"生活日用","type":"支出","amount":18.9,"remark":"宠物无害杀虫剂...","source":"支付宝"},
+  {"date":"2026-06-01","category":"生活日用","type":"支出","amount":22.91,"remark":"电蚊香液...","source":"支付宝"},
+  {"date":"2026-06-01","category":"生活日用","type":"支出","amount":14.9,"remark":"麦当劳","source":"微信"},
+  {"date":"2026-06-02","category":"生活日用","type":"支出","amount":7.1,"remark":"优品汇生活超市","source":"支付宝"},
+  {"date":"2026-06-02","category":"生活日用","type":"支出","amount":65.45,"remark":"好想来零食乐园","source":"支付宝"},
+  {"date":"2026-06-02","category":"生活服务","type":"支出","amount":200,"remark":"话费充值","source":"支付宝"},
+  {"date":"2026-06-02","category":"餐饮","type":"支出","amount":58,"remark":"青海牛肉拉面","source":"支付宝"},
+  {"date":"2026-06-02","category":"生活服务","type":"支出","amount":10,"remark":"账户充值","source":"支付宝"},
+  {"date":"2026-06-02","category":"生活日用","type":"支出","amount":20.99,"remark":"星巴克 美式咖啡","source":"支付宝"},
+  {"date":"2026-06-02","category":"生活日用","type":"支出","amount":10.8,"remark":"麦当劳","source":"微信"},
+  {"date":"2026-06-03","category":"餐饮","type":"支出","amount":5,"remark":"青岛友客便利","source":"支付宝"},
+  {"date":"2026-06-03","category":"生活日用","type":"支出","amount":11.7,"remark":"散单运费","source":"微信"},
+  {"date":"2026-06-03","category":"生活日用","type":"支出","amount":14.9,"remark":"麦当劳","source":"微信"},
+  {"date":"2026-06-04","category":"餐饮","type":"支出","amount":1.2,"remark":"贾志华水果店","source":"支付宝"},
+  {"date":"2026-06-04","category":"生活日用","type":"支出","amount":21.73,"remark":"星巴克美式","source":"支付宝"},
+  {"date":"2026-06-04","category":"生活日用","type":"支出","amount":22.2,"remark":"一一刀削面","source":"微信"},
+  {"date":"2026-06-04","category":"生活日用","type":"支出","amount":14.4,"remark":"麦当劳","source":"微信"},
+  {"date":"2026-06-05","category":"生活日用","type":"支出","amount":9.7,"remark":"优品汇生活超市","source":"支付宝"},
+  {"date":"2026-06-05","category":"餐饮","type":"支出","amount":34,"remark":"贾志华水果店","source":"支付宝"},
+  {"date":"2026-06-05","category":"生活日用","type":"支出","amount":34.4,"remark":"万福领鲜","source":"支付宝"},
+  {"date":"2026-06-05","category":"生活日用","type":"支出","amount":21.71,"remark":"星巴克美式","source":"支付宝"},
+  {"date":"2026-06-05","category":"餐饮","type":"支出","amount":4.82,"remark":"贾志华水果店","source":"支付宝"},
+  {"date":"2026-06-05","category":"生活日用","type":"支出","amount":14.1,"remark":"麦当劳","source":"微信"},
+  {"date":"2026-06-05","category":"工资","type":"收入","amount":390.38,"remark":"PingPong TikTok入账","source":"PingPong"},
+  {"date":"2026-06-06","category":"生活日用","type":"支出","amount":32.5,"remark":"优品汇生活超市","source":"支付宝"},
+  {"date":"2026-06-06","category":"工资","type":"收入","amount":143.92,"remark":"PingPong TikTok入账","source":"PingPong"},
+  {"date":"2026-06-07","category":"餐饮","type":"支出","amount":31,"remark":"青海牛肉拉面","source":"支付宝"},
+  {"date":"2026-06-07","category":"休闲社交","type":"支出","amount":45.6,"remark":"杨铭宇黄焖鸡","source":"支付宝"},
+  {"date":"2026-06-07","category":"生活日用","type":"支出","amount":5.16,"remark":"充电订单","source":"微信"},
+  {"date":"2026-06-07","category":"生活日用","type":"支出","amount":38,"remark":"二维码收款","source":"微信"},
+  {"date":"2026-06-07","category":"生活日用","type":"支出","amount":5.16,"remark":"充电订单","source":"微信"},
+  {"date":"2026-06-07","category":"工资","type":"收入","amount":281.33,"remark":"PingPong TikTok入账","source":"PingPong"},
+  {"date":"2026-06-07","category":"退款收入","type":"收入","amount":4.56,"remark":"商家退款","source":"微信"},
+  {"date":"2026-06-08","category":"餐饮","type":"支出","amount":17.9,"remark":"美团","source":"微信"},
+  {"date":"2026-06-08","category":"生活日用","type":"支出","amount":15.6,"remark":"麦当劳","source":"微信"},
+  {"date":"2026-06-08","category":"退款收入","type":"收入","amount":3.13,"remark":"商家退款","source":"微信"},
+  {"date":"2026-06-08","category":"信用借还","type":"支出","amount":658.3,"remark":"1688增值服务","source":"支付宝"},
+  {"date":"2026-06-09","category":"生活日用","type":"支出","amount":2.5,"remark":"可好便利店","source":"支付宝"},
+  {"date":"2026-06-09","category":"生活日用","type":"支出","amount":69.94,"remark":"小茶几家具","source":"支付宝"},
+  {"date":"2026-06-10","category":"工资","type":"收入","amount":78.84,"remark":"PingPong TikTok入账","source":"PingPong"},
+  {"date":"2026-06-10","category":"工资","type":"收入","amount":5323.33,"remark":"基本工资入账","source":"招商银行"},
+  {"date":"2026-06-10","category":"生活日用","type":"支出","amount":20.99,"remark":"星巴克美式","source":"支付宝"},
+  {"date":"2026-06-10","category":"餐饮","type":"支出","amount":6.9,"remark":"7-ELEVEn瞿塘峡路店","source":"支付宝"},
+  {"date":"2026-06-11","category":"信用借还","type":"支出","amount":521.01,"remark":"信用卡还款","source":"支付宝"},
+  {"date":"2026-06-11","category":"数码电器","type":"支出","amount":47.9,"remark":"绿联蓝牙适配器","source":"支付宝"},
+  {"date":"2026-06-11","category":"餐饮","type":"支出","amount":8,"remark":"7-ELEVEn","source":"支付宝"},
+  {"date":"2026-06-11","category":"生活日用","type":"支出","amount":9,"remark":"同佳乐超市","source":"支付宝"},
+  {"date":"2026-06-11","category":"工资","type":"收入","amount":78.62,"remark":"PingPong TikTok入账","source":"PingPong"},
+  {"date":"2026-06-12","category":"工资","type":"收入","amount":78.84,"remark":"PingPong TikTok入账","source":"PingPong"},
+  {"date":"2026-06-12","category":"生活日用","type":"支出","amount":18,"remark":"星巴克冰摇","source":"支付宝"},
+  {"date":"2026-06-12","category":"生活日用","type":"支出","amount":20.99,"remark":"星巴克美式","source":"支付宝"},
+  {"date":"2026-06-12","category":"休闲社交","type":"支出","amount":2,"remark":"华姐","source":"微信"},
+  {"date":"2026-06-13","category":"其他收入","type":"收入","amount":6.48,"remark":"微信红包-熊建川","source":"微信"},
+  {"date":"2026-06-13","category":"工资","type":"收入","amount":146.36,"remark":"PingPong TikTok入账","source":"PingPong"},
+  {"date":"2026-06-14","category":"工资","type":"收入","amount":73.61,"remark":"PingPong TikTok入账","source":"PingPong"},
+  {"date":"2026-06-12","category":"其他收入","type":"收入","amount":8.41,"remark":"钉钉零钱包提现-李景辉","source":"支付宝"},
+  {"date":"2026-06-13","category":"生活服务","type":"支出","amount":6,"remark":"iCloud由云上贵州运营","source":"支付宝"},
+  {"date":"2026-06-13","category":"生活日用","type":"支出","amount":34.3,"remark":"星巴克杯子经典黑白铜章马克杯","source":"支付宝"},
+  {"date":"2026-06-13","category":"生活日用","type":"支出","amount":5.16,"remark":"充电订单(商家370200615204)","source":"微信"},
+  {"date":"2026-06-14","category":"退款收入","type":"收入","amount":2.16,"remark":"商家退款(370200615204)","source":"微信"},
+  {"date":"2026-06-14","category":"生活日用","type":"支出","amount":7.44,"remark":"衣架家用挂衣无痕防肩角","source":"支付宝"},
+  {"date":"2026-06-14","category":"休闲社交","type":"支出","amount":15.8,"remark":"亲情卡-仕媛(唐仕媛)","source":"支付宝"},
+  {"date":"2026-06-14","category":"餐饮","type":"支出","amount":16.8,"remark":"杨铭宇黄焖鸡米饭(尚嘉中心店)","source":"支付宝"},
+  {"date":"2026-06-15","category":"交通出行","type":"支出","amount":46.5,"remark":"高德打车订单","source":"支付宝"},
+  {"date":"2026-06-15","category":"生活日用","type":"支出","amount":7.72,"remark":"修眉刀2026新款安全型防刮修剪刮眉","source":"支付宝"},
+  {"date":"2026-06-15","category":"餐饮","type":"支出","amount":4,"remark":"友客便利店","source":"支付宝"},
+  {"date":"2026-06-15","category":"数码电器","type":"支出","amount":92,"remark":"海尔统帅空气循环扇(百亿合伙人)","source":"支付宝"},
+  {"date":"2026-06-15","category":"餐饮","type":"支出","amount":14,"remark":"中国兰州牛肉拉面","source":"微信"},
+  {"date":"2026-06-17","category":"工资","type":"收入","amount":146.43,"remark":"PingPong TikTok入账","source":"PingPong"}
+];
+
 init();
 </script>
 
 <!-- Embedded June Data -->
-<script>
-const IMPORTED_JUNE_DATA = [
-  {"date":"2026-06-01","category":"生活日用","type":"支出","amount":9.9,"remark":"滴露消毒液","source":"支付宝"},
-  {"date":"2026-06-01","category":"通讯","type":"支出","amount":150,"remark":"通信费月付","source":"银行卡"},
-  {"date":"2026-06-02","category":"数码电器","type":"支出","amount":47.9,"remark":"1688","source":"支付宝"},
-  {"date":"2026-06-03","category":"信用借还","type":"支出","amount":998,"remark":"网商银行·1688","source":"支付宝"},
-  {"date":"2026-06-03","category":"餐饮","type":"支出","amount":8,"remark":"中国兰州拉面","source":"微信"},
-  {"date":"2026-06-03","category":"餐饮","type":"支出","amount":11.2,"remark":"凉皮","source":"微信"},
-  {"date":"2026-06-04","category":"生活日用","type":"支出","amount":33.79,"remark":"1688","source":"支付宝"},
-  {"date":"2026-06-05","category":"生活日用","type":"支出","amount":13.3,"remark":"金枕榴莲披萨","source":"支付宝"},
-  {"date":"2026-06-05","category":"通讯","type":"支出","amount":200,"remark":"充话费·工商银行信用卡","source":"支付宝"},
-  {"date":"2026-06-06","category":"生活日用","type":"支出","amount":12,"remark":"杨铭宇黄焖鸡米饭(控江路店)","source":"支付宝"},
-  {"date":"2026-06-07","category":"生活日用","type":"支出","amount":6.99,"remark":"1688","source":"支付宝"},
-  {"date":"2026-06-07","category":"宠物","type":"支出","amount":163,"remark":"皇家MIJ宠物猫粮","source":"支付宝"},
-  {"date":"2026-06-07","category":"餐饮","type":"支出","amount":17.2,"remark":"中国兰州牛肉拉面","source":"微信"},
-  {"date":"2026-06-08","category":"生活日用","type":"支出","amount":10.85,"remark":"扶农公众号商城","source":"微信"},
-  {"date":"2026-06-09","category":"餐饮","type":"支出","amount":24.3,"remark":"老乡鸡(上海控江旭辉MALL店)","source":"支付宝"},
-  {"date":"2026-06-09","category":"休闲娱乐","type":"支出","amount":45.6,"remark":"看电影","source":"微信"},
-  {"date":"2026-06-10","category":"工资薪金","type":"收入","amount":5323.33,"remark":"工资卡/建设银行","source":"银行卡"},
-  {"date":"2026-06-10","category":"信用借还","type":"支出","amount":181.31,"remark":"花呗·工商银行信用卡","source":"支付宝"},
-  {"date":"2026-06-10","category":"餐饮","type":"支出","amount":31.9,"remark":"乡村胡子烤鸡(上海海伦·路店)","source":"支付宝"},
-  {"date":"2026-06-10","category":"生活日用","type":"支出","amount":35.99,"remark":"1688","source":"支付宝"},
-  {"date":"2026-06-10","category":"餐饮","type":"支出","amount":31.41,"remark":"乡村胡子烤鸡(上海海伦·路店)","source":"支付宝"},
-  {"date":"2026-06-11","category":"生活日用","type":"支出","amount":21.98,"remark":"1688","source":"支付宝"},
-  {"date":"2026-06-11","category":"餐饮","type":"支出","amount":21.11,"remark":"紫燕百味鸡·紫燕四拼","source":"微信"},
-  {"date":"2026-06-12","category":"生活日用","type":"支出","amount":12.95,"remark":"钱排银妃三宝李","source":"微信"},
-  {"date":"2026-06-12","category":"数码家电","type":"支出","amount":9.9,"remark":"1688","source":"支付宝"},
-  {"date":"2026-06-12","category":"餐饮","type":"支出","amount":19,"remark":"星巴克","source":"微信"},
-  {"date":"2026-06-12","category":"餐饮","type":"支出","amount":17,"remark":"紫燕百味鸡","source":"微信"},
-  {"date":"2026-06-13","category":"生活服务","type":"支出","amount":6,"remark":"套餐包","source":"支付宝"},
-  {"date":"2026-06-13","category":"生活日用","type":"支出","amount":34.3,"remark":"星巴克杯子","source":"支付宝"},
-  {"date":"2026-06-13","category":"数码家电","type":"支出","amount":5.16,"remark":"充电订单","source":"支付宝"},
-  {"date":"2026-06-14","category":"生活日用","type":"支出","amount":7.44,"remark":"家用防滑无痕衣架","source":"支付宝"},
-  {"date":"2026-06-14","category":"人情社交","type":"支出","amount":15.8,"remark":"亲情卡-仕媛(唐仕媛)","source":"支付宝"},
-  {"date":"2026-06-14","category":"餐饮","type":"支出","amount":16.8,"remark":"杨铭宇黄焖鸡米饭(尚嘉中心店)","source":"支付宝"},
-  {"date":"2026-06-14","category":"其他收入","type":"收入","amount":2.16,"remark":"商家退款","source":"支付宝"},
-  {"date":"2026-06-15","category":"交通出行","type":"支出","amount":46.5,"remark":"高德打车","source":"支付宝"},
-  {"date":"2026-06-15","category":"生活日用","type":"支出","amount":7.72,"remark":"2026新款安全型修眉刀","source":"支付宝"},
-  {"date":"2026-06-15","category":"餐饮","type":"支出","amount":4,"remark":"友客便利店","source":"支付宝"},
-  {"date":"2026-06-15","category":"数码家电","type":"支出","amount":92,"remark":"海尔统帅空气循环扇","source":"支付宝"},
-  {"date":"2026-06-15","category":"餐饮","type":"支出","amount":14,"remark":"中国兰州牛肉拉面","source":"支付宝"},
-  {"date":"2026-06-01","category":"信用卡还款","type":"支出","amount":296,"remark":"信用卡分期月付","source":"银行卡"},
-  {"date":"2026-06-02","category":"房贷","type":"支出","amount":4581.06,"remark":"济南房产月供","source":"银行卡"},
-  {"date":"2026-06-02","category":"车位贷","type":"支出","amount":1091.22,"remark":"车位贷款月供","source":"银行卡"},
-  {"date":"2026-06-01","category":"房租","type":"支出","amount":1750,"remark":"黄岛薛家岛房租+物业费¥143","source":"支付宝"}
-];
-</script>
 </body>
 </html>
