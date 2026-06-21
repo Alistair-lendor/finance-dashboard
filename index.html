@@ -796,6 +796,25 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+// ======== REMOTE DATA SYNC ========
+// Try to fetch remote data as initial seed when localStorage is empty
+(function() {
+  const imported = localStorage.getItem('finance_imported');
+  const userRecords = loadRecords();
+  if (!imported && userRecords.length === 0) {
+    fetch('https://alistairlendar.com/finance-records.json')
+      .then(r => r.json())
+      .then(data => {
+        if (data && data.length > 0) {
+          saveRecords(data);
+          localStorage.setItem('finance_imported', '1');
+          if (typeof refreshDisplay === 'function') refreshDisplay();
+        }
+      })
+      .catch(() => {});
+  }
+})();
+
 // ======== INIT ========
 function init(){
   migrateData();
